@@ -1,498 +1,204 @@
-import { GitCommitHorizontal, GitFork, GitCompareArrows } from "lucide-react";
-import { IoGitBranchOutline } from "react-icons/io5";
-import { SiOpenai, SiClaude, SiGoogle } from "react-icons/si";
-import { GrokIcon } from "./grok-icon";
-import React from "react";
+// Provider types
+export type Provider = "openai" | "anthropic" | "google";
 
-// Model Provider Types
 export interface ModelConfig {
-  value: string;
+  id: string;
   label: string;
-  modalities: string[];
-  description?: string;
-  capabilities?: string[];
+  provider: Provider;
+  capabilities: string[];
+  isDefault?: boolean;
 }
 
-export interface ModelProvider {
+export interface ProviderConfig {
   name: string;
-  icon: React.ComponentType<{ size?: number; className?: string }>;
-  iconColor: string;
-  bgColor: string;
+  color: string;
   models: ModelConfig[];
 }
 
-export interface ModelProviders {
-  openai: ModelProvider;
-  anthropic: ModelProvider;
-  xai: ModelProvider;
-  google: ModelProvider;
-}
-
-// Centralized Model Providers Configuration
-export const MODEL_PROVIDERS: ModelProviders = {
+// Model configurations - latest models as of March 2026
+export const PROVIDERS: Record<Provider, ProviderConfig> = {
   openai: {
     name: "OpenAI",
-    icon: SiOpenai,
-    iconColor: "text-white",
-    bgColor: "bg-[#000000]",
+    color: "#10a37f",
     models: [
-      // Flagship Models (Sweet Spot)
       {
-        value: "gpt-4o",
-        label: "ChatGPT 4o",
-        modalities: ["text", "vision", "audio", "code"],
-        description: "Flagship multimodal model with real-time capabilities",
-        capabilities: [
-          "Real-time reasoning",
-          "Voice interaction",
-          "Image analysis",
-        ],
+        id: "gpt-4o",
+        label: "GPT-4o",
+        provider: "openai",
+        capabilities: ["text", "vision", "web-search", "code"],
+        isDefault: true,
       },
       {
-        value: "gpt-4o-mini",
-        label: "ChatGPT 4o Mini",
-        modalities: ["text", "vision", "fast"],
-        description: "Fast and cost-effective multimodal model",
-        capabilities: ["Quick responses", "Vision analysis", "Cost-efficient"],
+        id: "gpt-4o-mini",
+        label: "GPT-4o Mini",
+        provider: "openai",
+        capabilities: ["text", "vision", "fast"],
       },
-
-      // GPT 4.1 Series
       {
-        value: "gpt-4.1",
-        label: "ChatGPT 4.1",
-        modalities: ["text", "vision", "code"],
-        description: "Enhanced GPT-4 with improved capabilities",
-        capabilities: [
-          "Improved reasoning",
-          "Better code generation",
-          "Enhanced accuracy",
-        ],
+        id: "gpt-4.1",
+        label: "GPT-4.1",
+        provider: "openai",
+        capabilities: ["text", "vision", "code"],
+      },
+      {
+        id: "o4-mini",
+        label: "o4 Mini",
+        provider: "openai",
+        capabilities: ["text", "reasoning"],
       },
     ],
   },
-
   anthropic: {
     name: "Anthropic",
-    icon: SiClaude,
-    iconColor: "text-[#da7756]",
-    bgColor: "bg-[#000000]",
+    color: "#d4a574",
     models: [
-      // Claude 4 Series (Latest Sweet Spot)
       {
-        value: "claude-sonnet-4-20250514",
+        id: "claude-sonnet-4-20250514",
         label: "Claude Sonnet 4",
-        modalities: ["text", "vision", "code"],
-        description: "High-performance model with exceptional capabilities",
-        capabilities: [
-          "Advanced coding",
-          "Complex analysis",
-          "Vision analysis",
-        ],
-      },
-
-      // Claude 3.7 Series
-      {
-        value: "claude-3-7-sonnet-20250219",
-        label: "Claude Sonnet 3.7",
-        modalities: ["text", "vision", "code"],
-        description: "Enhanced model with extended thinking capabilities",
-        capabilities: [
-          "Extended thinking",
-          "Deep analysis",
-          "Thoughtful responses",
-        ],
-      },
-
-      // Claude 3.5 Series (Proven Workhorses)
-      {
-        value: "claude-3-5-sonnet-20241022",
-        label: "Claude 3.5 Sonnet",
-        modalities: ["text", "vision", "code"],
-        description: "Proven high-performance model for complex tasks",
-        capabilities: ["Code generation", "Vision analysis", "Tool use"],
+        provider: "anthropic",
+        capabilities: ["text", "vision", "code", "thinking"],
+        isDefault: true,
       },
       {
-        value: "claude-3-5-haiku-20241022",
-        label: "Claude 3.5 Haiku",
-        modalities: ["text", "vision", "fast"],
-        description: "Fast and efficient model for quick tasks",
-        capabilities: [
-          "Rapid responses",
-          "Cost-effective",
-          "Reliable performance",
-        ],
+        id: "claude-opus-4-20250514",
+        label: "Claude Opus 4",
+        provider: "anthropic",
+        capabilities: ["text", "vision", "code", "thinking"],
+      },
+      {
+        id: "claude-3-7-sonnet-20250219",
+        label: "Claude 3.7 Sonnet",
+        provider: "anthropic",
+        capabilities: ["text", "vision", "code", "thinking"],
+      },
+      {
+        id: "claude-haiku-4-5-20251001",
+        label: "Claude Haiku 4.5",
+        provider: "anthropic",
+        capabilities: ["text", "vision", "fast"],
       },
     ],
   },
-
-  xai: {
-    name: "xAI",
-    icon: GrokIcon,
-    iconColor: "text-white",
-    bgColor: "bg-[#000000]",
-    models: [
-      // Grok 4 Series (Latest)
-      {
-        value: "grok-4-0709",
-        label: "Grok 4",
-        modalities: ["text", "vision", "web"],
-        description: "Latest flagship model with real-time data access",
-        capabilities: [
-          "Real-time data",
-          "Market analysis",
-          "Deep domain knowledge",
-        ],
-      },
-
-      // Grok 3 Series
-      {
-        value: "grok-3",
-        label: "Grok 3",
-        modalities: ["text", "vision", "web"],
-        description: "Flagship model with real-time data access",
-        capabilities: ["Real-time data", "Market analysis", "Web browsing"],
-      },
-      {
-        value: "grok-3-mini-fast",
-        label: "Grok 3 Mini Fast",
-        modalities: ["text", "fast"],
-        description: "Balance of speed and cost-effectiveness",
-        capabilities: ["Fast responses", "Cost-efficient", "Reliable"],
-      },
-    ],
-  },
-
   google: {
     name: "Google",
-    icon: SiGoogle,
-    iconColor: "text-white",
-    bgColor: "bg-[#000000]",
+    color: "#4285f4",
     models: [
-      // Gemini 2.5 Series (Latest)
       {
-        value: "gemini-2.0-flash-exp",
-        label: "Gemini 2.0 Flash Experimental",
-        modalities: ["text", "vision", "code", "fast"],
-        description:
-          "Experimental fast multimodal model with cutting-edge features",
-        capabilities: [
-          "Ultra-fast responses",
-          "Vision analysis",
-          "Code generation",
-        ],
-      },
-
-      // Gemini 1.5 Series
-      {
-        value: "gemini-1.5-pro",
-        label: "Gemini 1.5 Pro",
-        modalities: ["text", "vision", "code"],
-        description: "High-performance multimodal model",
-        capabilities: [
-          "Advanced reasoning",
-          "Long context window",
-          "Vision analysis",
-        ],
+        id: "gemini-2.5-pro-preview-05-06",
+        label: "Gemini 2.5 Pro",
+        provider: "google",
+        capabilities: ["text", "vision", "code", "thinking"],
+        isDefault: true,
       },
       {
-        value: "gemini-1.5-flash",
-        label: "Gemini 1.5 Flash",
-        modalities: ["text", "vision", "code", "fast"],
-        description: "Fast and efficient multimodal model",
-        capabilities: ["Quick responses", "Cost-effective", "Vision support"],
+        id: "gemini-2.5-flash-preview-05-20",
+        label: "Gemini 2.5 Flash",
+        provider: "google",
+        capabilities: ["text", "vision", "code", "fast"],
+      },
+      {
+        id: "gemini-2.0-flash",
+        label: "Gemini 2.0 Flash",
+        provider: "google",
+        capabilities: ["text", "vision", "fast"],
       },
     ],
   },
 };
 
-// Helper function to get provider from model name
-export const getProviderKey = (modelValue: string): keyof ModelProviders => {
-  if (
-    modelValue.includes("gpt") ||
-    modelValue.includes("o1") ||
-    modelValue.includes("o3") ||
-    modelValue.includes("o4")
-  ) {
-    return "openai";
-  }
-  if (modelValue.includes("claude")) {
-    return "anthropic";
-  }
-  if (modelValue.includes("grok")) {
-    return "xai";
-  }
-  if (modelValue.includes("gemini")) {
-    return "google";
-  }
-  return "openai"; // Default fallback
+export const ALL_MODELS: ModelConfig[] = Object.values(PROVIDERS).flatMap(
+  (p) => p.models
+);
+
+export const DEFAULT_MODELS: Record<Provider, string> = {
+  openai: "gpt-4o",
+  anthropic: "claude-sonnet-4-20250514",
+  google: "gemini-2.5-pro-preview-05-06",
 };
 
-// Helper function to get all allowed model values (for API validation)
-export const getAllowedModels = (): string[] => {
-  return Object.values(MODEL_PROVIDERS).flatMap((provider: ModelProvider) =>
-    provider.models.map((model: ModelConfig) => model.value)
-  );
-};
+export function getProvider(modelId: string): Provider {
+  if (modelId.includes("gpt") || modelId.includes("o4") || modelId.includes("o3") || modelId.includes("o1")) return "openai";
+  if (modelId.includes("claude")) return "anthropic";
+  if (modelId.includes("gemini")) return "google";
+  return "openai";
+}
 
-// Helper function to check if a model supports reasoning (for future use)
-export const isReasoningModel = (model: string): boolean => {
-  // Preserved for future reasoning model support
-  return model.includes("o1") || model.includes("o3") || model.includes("o4");
-};
+export function getProviderConfig(modelId: string): ProviderConfig {
+  return PROVIDERS[getProvider(modelId)];
+}
 
-// Chain configuration
-export const MAX_AGENTS_PER_CHAIN = 4;
+export function getModelConfig(modelId: string): ModelConfig | undefined {
+  return ALL_MODELS.find((m) => m.id === modelId);
+}
 
-// Connection types configuration
-export type EnabledConnectionType =
-  | "direct"
-  | "conditional"
-  | "parallel"
-  | "collaborative";
-export type AllConnectionType = EnabledConnectionType;
+export const MAX_AGENTS = 4;
 
-export const CONNECTION_TYPES = [
-  {
-    type: "direct" as const,
-    label: "Direct",
-    Icon: GitCommitHorizontal,
-    description: "Pass previous agent's output directly",
-    color: "text-blue-400",
-  },
-  {
-    type: "conditional" as const,
-    label: "Conditional",
-    Icon: IoGitBranchOutline,
-    description: "Run only if a condition is met",
-    color: "text-amber-400",
-    iconRotate: "rotate-90",
-  },
-  {
-    type: "parallel" as const,
-    label: "Parallel",
-    Icon: GitFork,
-    description: "Run simultaneously",
-    color: "text-purple-400",
-    iconRotate: "rotate-90",
-  },
-  {
-    type: "collaborative" as const,
-    label: "Collaborative",
-    Icon: GitCompareArrows,
-    description: "Agents work together iteratively",
-    color: "text-green-400",
-    bgColor: "bg-green-500/10",
-    borderColor: "border-green-500/30",
-  },
-] satisfies Array<{
-  type: AllConnectionType;
-  label: string;
-  Icon: React.ComponentType<any>;
-  description: string;
-  disabled?: boolean;
-  color: string;
-  iconRotate?: string;
-  bgColor?: string;
-  borderColor?: string;
-}>;
-
-export const CONDITION_PRESETS = [
-  {
-    label: "Contains keyword",
-    condition: "contains('keyword')",
-    placeholder: "contains('error')",
-  },
-  {
-    label: "Starts with",
-    condition: "starts_with('text')",
-    placeholder: "starts_with('SUCCESS')",
-  },
-  {
-    label: "Ends with",
-    condition: "ends_with('text')",
-    placeholder: "ends_with('.')",
-  },
-  {
-    label: "Length greater than",
-    condition: "length > 100",
-    placeholder: "length > 50",
-  },
-  {
-    label: "Length less than",
-    condition: "length < 100",
-    placeholder: "length < 200",
-  },
-  {
-    label: "Not empty",
-    condition: "length > 0",
-    placeholder: "length > 0",
-  },
-];
-
-// Default agent configuration
-export const DEFAULT_AGENT_CONFIG = {
-  model: "gpt-4o",
-  name: "",
-  prompt: "",
-  temperature: 0.5,
-  max_tokens: 1000,
-  top_p: 1,
-  frequency_penalty: 0,
-  presence_penalty: 0,
-};
-
-// Template definitions for quick-start prompts
-export interface PromptTemplate {
+// Agent chain preset templates
+export interface ChainPreset {
   id: string;
-  title: string;
+  name: string;
   description: string;
-  primaryConnectionType: EnabledConnectionType | "mixed";
-  agentCount: number;
   agents: Array<{
     name: string;
-    prompt: string;
     model: string;
-    connection?: {
-      type: EnabledConnectionType;
-      condition?: string;
-    };
+    systemPrompt: string;
   }>;
 }
 
-export const DEFAULT_PROMPT_TEMPLATES: PromptTemplate[] = [
+export const DEFAULT_PRESETS: ChainPreset[] = [
   {
-    id: "content-pipeline",
-    title: "Content Creation Pipeline",
-    description: "Sequential content creation and optimization workflow",
-    primaryConnectionType: "direct",
-    agentCount: 2,
+    id: "draft-review",
+    name: "Draft & Review",
+    description: "Write content with one model, refine with another",
     agents: [
       {
-        name: "Content Creator",
-        prompt:
-          "Create engaging, well-structured content based on the topic provided. Focus on clarity, flow, and compelling messaging.",
+        name: "Writer",
         model: "gpt-4o",
+        systemPrompt: "Write clear, engaging content based on the user's request.",
       },
       {
-        name: "Content Optimizer",
-        prompt:
-          "Review and optimize the content for SEO, readability, and engagement. Suggest improvements for headlines, structure, and call-to-actions.",
-        model: "claude-3-5-sonnet-20241022",
-        connection: {
-          type: "direct",
-        },
-      },
-    ],
-  },
-  {
-    id: "smart-review",
-    title: "Smart Content Review",
-    description:
-      "Conditional workflow that routes content based on quality assessment",
-    primaryConnectionType: "conditional",
-    agentCount: 3,
-    agents: [
-      {
-        name: "Content Analyzer",
-        prompt:
-          "Analyze the provided content for quality, clarity, and completeness. Rate it on a scale of 1-10 and identify any major issues.",
-        model: "gpt-4o",
-      },
-      {
-        name: "Content Improver",
-        prompt:
-          "Improve the content by addressing the issues identified. Focus on enhancing clarity, structure, and engagement.",
-        model: "claude-3-5-sonnet-20241022",
-        connection: {
-          type: "conditional",
-          condition: "contains('Rating: [1-6]')",
-        },
-      },
-      {
-        name: "Final Formatter",
-        prompt:
-          "Apply final formatting, polish the language, and ensure consistent style throughout the content.",
-        model: "gpt-4o",
-        connection: {
-          type: "direct",
-        },
+        name: "Reviewer",
+        model: "claude-sonnet-4-20250514",
+        systemPrompt: "Review and improve the previous content. Fix issues, enhance clarity, and polish the writing.",
       },
     ],
   },
   {
     id: "multi-perspective",
-    title: "Multi-Perspective Analysis",
-    description: "Parallel analysis from different expert viewpoints",
-    primaryConnectionType: "parallel",
-    agentCount: 3,
+    name: "Multi-Perspective",
+    description: "Get analysis from three different AI perspectives",
     agents: [
       {
-        name: "Technical Expert",
-        prompt:
-          "Analyze from a technical perspective, focusing on feasibility, implementation challenges, and technical requirements.",
+        name: "Analyst A",
         model: "gpt-4o",
+        systemPrompt: "Analyze the topic from a practical, implementation-focused perspective.",
       },
       {
-        name: "Business Analyst",
-        prompt:
-          "Evaluate from a business perspective, considering market viability, costs, benefits, and strategic alignment.",
-        model: "claude-3-5-sonnet-20241022",
-        connection: {
-          type: "parallel",
-        },
+        name: "Analyst B",
+        model: "claude-sonnet-4-20250514",
+        systemPrompt: "Analyze from a critical, devil's advocate perspective. Challenge assumptions in the previous analysis.",
       },
       {
-        name: "Synthesis Expert",
-        prompt:
-          "Synthesize the technical and business analyses into actionable recommendations with clear next steps.",
-        model: "gpt-4o",
-        connection: {
-          type: "direct",
-        },
+        name: "Synthesizer",
+        model: "gemini-2.5-pro-preview-05-06",
+        systemPrompt: "Synthesize the previous analyses into a balanced, actionable summary with clear recommendations.",
       },
     ],
   },
   {
-    id: "research-chain",
-    title: "Complex Research Chain",
-    description:
-      "Multi-stage research with conditional routing and parallel analysis",
-    primaryConnectionType: "mixed",
-    agentCount: 4,
+    id: "code-pipeline",
+    name: "Code Pipeline",
+    description: "Generate code, then review and test it",
     agents: [
       {
-        name: "Research Planner",
-        prompt:
-          "Create a comprehensive research plan, identifying key areas to investigate and research questions to answer.",
+        name: "Coder",
+        model: "claude-sonnet-4-20250514",
+        systemPrompt: "Write clean, well-structured code based on the requirements.",
+      },
+      {
+        name: "Reviewer",
         model: "gpt-4o",
-      },
-      {
-        name: "Data Gatherer",
-        prompt:
-          "Gather relevant information and data based on the research plan. Focus on finding credible sources and key insights.",
-        model: "claude-3-5-sonnet-20241022",
-        connection: {
-          type: "direct",
-        },
-      },
-      {
-        name: "Critical Analyzer",
-        prompt:
-          "Critically analyze the gathered data for accuracy, relevance, and potential biases. Identify gaps or areas needing deeper investigation.",
-        model: "gpt-4o",
-        connection: {
-          type: "conditional",
-          condition: "length > 100",
-        },
-      },
-      {
-        name: "Report Generator",
-        prompt:
-          "Compile all research into a comprehensive, well-structured report with clear conclusions and recommendations.",
-        model: "claude-3-5-sonnet-20241022",
-        connection: {
-          type: "direct",
-        },
+        systemPrompt: "Review the code for bugs, security issues, and improvements. Provide the corrected version.",
       },
     ],
   },
