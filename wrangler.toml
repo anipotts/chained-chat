@@ -1,0 +1,35 @@
+name = "chained-chat"
+compatibility_date = "2025-04-01"
+compatibility_flags = ["nodejs_compat"]
+account_id = "0f856093bdcd34a7da1bde5ee4385163"
+main = ".open-next/worker.js"
+workers_dev = true
+
+[assets]
+directory = ".open-next/assets"
+binding = "ASSETS"
+
+[observability]
+enabled = true
+
+# Streaming AI routes (run-chain, stream-agent, stream-parallel) need
+# verification that OpenNext + Workers preserves streaming responses
+# end-to-end. The Vercel maxDuration: 30 cap doesn't apply on Workers
+# (Workers stream as long as the client is connected). Smart Placement
+# is worth toggling once Convex is verified — Convex calls add latency
+# that smart placement can mask.
+#
+# [placement]
+# mode = "smart"
+
+# Custom-domain bind. Uncomment after the chained.chat zone is added.
+#
+# [[routes]]
+# pattern = "chained.chat"
+# custom_domain = true
+# zone_id = "<set after zone is created>"
+#
+# [[routes]]
+# pattern = "www.chained.chat"
+# custom_domain = true
+# zone_id = "<set after zone is created>"

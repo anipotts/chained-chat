@@ -29,8 +29,12 @@ yarn-error.log*
 .env*.local
 .env*.backup
 
-# vercel
+# vercel (legacy, project migrating off Vercel)
 .vercel
+
+# Cloudflare Workers + OpenNext
+.open-next/
+.wrangler/
 
 # typescript
 *.tsbuildinfo
